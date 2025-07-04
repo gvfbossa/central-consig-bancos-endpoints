@@ -2,7 +2,9 @@ package com.centralconsig.endpoints.application.service.util;
 
 import com.centralconsig.core.application.service.ClienteService;
 import com.centralconsig.core.domain.entity.Cliente;
+import com.centralconsig.core.domain.entity.GoogleSheet;
 import com.centralconsig.core.domain.entity.Vinculo;
+import com.centralconsig.endpoints.application.service.GoogleSheetService;
 import com.opencsv.CSVReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,23 +13,23 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CsvProcessorService {
 
     private final ClienteService clienteService;
+    private final GoogleSheetService googleSheetService;
 
     @Value("${sheet.download.dir}")
     private String CSV_DIR;
 
     private static final Logger log = LoggerFactory.getLogger(CsvProcessorService.class);
 
-    public CsvProcessorService(ClienteService clienteService) {
+    public CsvProcessorService(ClienteService clienteService, GoogleSheetService googleSheetService) {
         this.clienteService = clienteService;
+        this.googleSheetService = googleSheetService;
     }
 
     public void processCpfs() {
@@ -50,10 +52,17 @@ public class CsvProcessorService {
 
         Map<String, Cliente> clientesMap = new HashMap<>();
 
+        List<GoogleSheet> allSheets = googleSheetService.findAll();
+        Map<String, GoogleSheet> sheetsMap = allSheets.stream()
+                .collect(Collectors.toMap(GoogleSheet::getFileName, sheet -> sheet));
+
         for (File csvFile : csvFiles) {
             try (CSVReader reader = new CSVReader(new FileReader(csvFile))) {
                 String[] header = reader.readNext();
                 if (header == null) continue;
+
+                String currentFileName = csvFile.getName();
+                GoogleSheet sheet = sheetsMap.get(currentFileName);
 
                 int cpfIndex = -1;
                 int matriculaIndex = -1;
@@ -88,6 +97,7 @@ public class CsvProcessorService {
                                 Cliente c = new Cliente();
                                 c.setCpf(finalCpf);
                                 c.setCasa(csvFile.getName().toUpperCase().contains("CASA"));
+                                c.setGoogleSheet(sheet);
                                 return c;
                             });
 

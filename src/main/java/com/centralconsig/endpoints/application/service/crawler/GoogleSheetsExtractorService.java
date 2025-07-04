@@ -1,4 +1,4 @@
-package com.centralconsig.endpoints.application.service;
+package com.centralconsig.endpoints.application.service.crawler;
 
 import com.centralconsig.core.application.service.crawler.WebDriverService;
 import com.centralconsig.core.domain.entity.GoogleSheet;
@@ -47,21 +47,9 @@ public class GoogleSheetsExtractorService {
 
     @PostConstruct
     public void init() {
-        if (sheetRepository.count() == 0) {
-            List<GoogleSheet> sheets = List.of(
-                    new GoogleSheet("MARGEM CARTAO CAPITAL - CASA 04-25.csv",
-                            "https://docs.google.com/spreadsheets/d/1s9y_R5RJS3hOhoMpIQYwNXKcsdnKYCg5BeCUtyvvdfk/edit?gid=1748821058#gid=1748821058"),
-                    new GoogleSheet("MARGEM CARTAO CAPITAL - QUERO MAIS ALINE COMPLETA.csv",
-                            "https://docs.google.com/spreadsheets/d/1s9y_R5RJS3hOhoMpIQYwNXKcsdnKYCg5BeCUtyvvdfk/edit?gid=1011816552"),
-                    new GoogleSheet("MARGEM CARTAO CAPITAL - MAILING ALINE COMPLETA.csv",
-                            "https://docs.google.com/spreadsheets/d/1s9y_R5RJS3hOhoMpIQYwNXKcsdnKYCg5BeCUtyvvdfk/edit?gid=2000302543"));
-            sheetRepository.saveAll(sheets);
-        }
         File directory = getFileDir();
         if (!directory.exists())
             directory.mkdirs();
-        if (Objects.requireNonNull(directory.listFiles()).length == 0)
-            startDownload();
     }
 
     @Scheduled(cron = "0 0 12,15 1,16 * *", zone = "America/Sao_Paulo")

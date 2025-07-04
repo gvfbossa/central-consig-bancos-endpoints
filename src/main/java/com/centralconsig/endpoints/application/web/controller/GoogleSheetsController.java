@@ -1,8 +1,8 @@
 package com.centralconsig.endpoints.application.web.controller;
 
 import com.centralconsig.core.domain.entity.GoogleSheet;
-import com.centralconsig.core.domain.repository.GoogleSheetRepository;
-import com.centralconsig.endpoints.application.service.GoogleSheetsExtractorService;
+import com.centralconsig.endpoints.application.service.GoogleSheetService;
+import com.centralconsig.endpoints.application.service.crawler.GoogleSheetsExtractorService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,11 +15,11 @@ import java.nio.charset.StandardCharsets;
 public class GoogleSheetsController {
 
     private final GoogleSheetsExtractorService sheetExtractorService;
-    private final GoogleSheetRepository sheetRepository;
+    private final GoogleSheetService googleSheetService;
 
-    public GoogleSheetsController(GoogleSheetsExtractorService sheetExtractorService, GoogleSheetRepository sheetRepository) {
+    public GoogleSheetsController(GoogleSheetsExtractorService sheetExtractorService, GoogleSheetService googleSheetService) {
         this.sheetExtractorService = sheetExtractorService;
-        this.sheetRepository = sheetRepository;
+        this.googleSheetService = googleSheetService;
     }
 
     @PostMapping("/download")
@@ -34,7 +34,7 @@ public class GoogleSheetsController {
 
     @GetMapping
     public ResponseEntity<?> getSheets() {
-        return ResponseEntity.ok(sheetRepository.findAll());
+        return ResponseEntity.ok(googleSheetService.findAll());
     }
 
     @DeleteMapping("/{nome}")
@@ -42,9 +42,9 @@ public class GoogleSheetsController {
         try {
             System.out.println("Nome recebido: " + nome);
             String decodedNome = URLDecoder.decode(nome, StandardCharsets.UTF_8);
-            GoogleSheet sheet = sheetRepository.findByFileName(decodedNome);
+            GoogleSheet sheet = googleSheetService.findByFileName(decodedNome);
             if (sheet != null) {
-                sheetRepository.delete(sheet);
+                googleSheetService.delete(sheet);
                 return ResponseEntity.noContent().build();
             }
             return ResponseEntity.notFound().build();
@@ -53,11 +53,9 @@ public class GoogleSheetsController {
         }
     }
 
-
-
     @PostMapping("/nome")
     public ResponseEntity<?> saveSheets(@RequestBody GoogleSheet sheet) {
-        return ResponseEntity.ok(sheetRepository.save(sheet));
+        return ResponseEntity.ok(googleSheetService.save(sheet));
     }
 
 }
