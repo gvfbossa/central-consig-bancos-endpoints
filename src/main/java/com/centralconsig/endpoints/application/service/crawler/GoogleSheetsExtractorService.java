@@ -1,10 +1,12 @@
 package com.centralconsig.endpoints.application.service.crawler;
 
 import com.centralconsig.core.application.service.crawler.WebDriverService;
+import com.centralconsig.core.application.utils.CrawlerUtils;
 import com.centralconsig.core.domain.entity.GoogleSheet;
 import com.centralconsig.core.domain.repository.GoogleSheetRepository;
 import com.centralconsig.endpoints.application.service.util.CsvProcessorService;
 import jakarta.annotation.PostConstruct;
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
@@ -20,11 +22,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.net.URL;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class GoogleSheetsExtractorService {
@@ -91,11 +96,9 @@ public class GoogleSheetsExtractorService {
         try {
             List<GoogleSheet> sheets = sheetRepository.findAll();
             for (GoogleSheet sheet : sheets) {
-                driver.get(sheet.getUrl());
-
-                wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[text()='Arquivo']")));
-
-                downloadSheet(driver, wait, DOWNLOAD_DIR, sheet.getFileName());
+                String linkExport = gerarLinkExportacaoCsv(sheet.getUrl());
+                driver.get(linkExport);
+                waitForDownload(DOWNLOAD_DIR, sheet.getFileName());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -106,29 +109,20 @@ public class GoogleSheetsExtractorService {
         return true;
     }
 
-    private void downloadSheet(WebDriver driver, WebDriverWait wait, String downloadPath, String fileName) {
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+    public String gerarLinkExportacaoCsv(String linkOriginal) {
+        Pattern padraoId = Pattern.compile("/d/([a-zA-Z0-9-_]+)");
+        Matcher matcherId = padraoId.matcher(linkOriginal);
+
+        Pattern padraoGid = Pattern.compile("gid=([0-9]+)");
+        Matcher matcherGid = padraoGid.matcher(linkOriginal);
+
+        if (matcherId.find() && matcherGid.find()) {
+            String sheetId = matcherId.group(1);
+            String gid = matcherGid.group(1);
+            return "https://docs.google.com/spreadsheets/d/" + sheetId + "/export?format=csv&gid=" + gid;
         }
 
-        WebElement fileMenu = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[text()='Arquivo']")));
-        fileMenu.click();
-
-        Actions actions = new Actions(driver);
-        actions.sendKeys(Keys.DOWN)
-                .pause(Duration.ofMillis(500))
-                .sendKeys(Keys.RIGHT)
-                .pause(Duration.ofMillis(500))
-                .sendKeys(Keys.UP)
-                .pause(Duration.ofMillis(500))
-                .sendKeys(Keys.UP)
-                .pause(Duration.ofMillis(500))
-                .sendKeys(Keys.ENTER)
-                .perform();
-
-        waitForDownload(downloadPath, fileName);
+        throw new IllegalArgumentException("Link inválido: " + linkOriginal);
     }
 
     private void waitForDownload(String downloadPath, String fileName) {
@@ -141,7 +135,7 @@ public class GoogleSheetsExtractorService {
 
             assert files != null;
             File file = Arrays.stream(files)
-                    .filter(f -> f.getName().equals(fileName))
+                    .filter(f -> f.getName().contains(fileName))
                     .findFirst()
                     .orElse(null);
 
