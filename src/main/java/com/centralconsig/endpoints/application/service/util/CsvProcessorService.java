@@ -62,6 +62,8 @@ public class CsvProcessorService {
                 GoogleSheet sheet = findSheetByFileName(csvFile, allSheets)
                         .orElseThrow(() -> new IllegalStateException("Nenhuma GoogleSheet encontrada para o arquivo: " + csvFile.getName()));
 
+                log.info("Processando arquivo: '" + csvFile.getName() + "'");
+
                 int cpfIndex = -1;
                 int matriculaIndex = -1;
 
