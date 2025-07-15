@@ -41,7 +41,7 @@ public class ExportacaoClienteService {
             Row header = sheet.createRow(0);
             String[] colunas = {
                     "Nome", "CPF", "Matricula", "Data Consulta",
-                    "Situacao Beneficio", "Margem Beneficio", "Situacao Credito", "Margem Credito"
+                    "Situacao Beneficio", "Margem Beneficio", "Situacao Credito", "Margem Credito", "Aba Planilha"
             };
 
             for (int i = 0; i < colunas.length; i++) {
@@ -77,6 +77,8 @@ public class ExportacaoClienteService {
                 row.createCell(6).setCellValue(h.getSituacaoCredito());
                 row.createCell(7).setCellValue(h.getMargemCredito().isEmpty() ?
                         "0,00" : h.getMargemCredito());
+                row.createCell(8).setCellValue(cliente.getGoogleSheet().getFileName().isEmpty() ?
+                        "" : cliente.getGoogleSheet().getFileName());
             }
 
             for (int i = 0; i < colunas.length+1; i++) {

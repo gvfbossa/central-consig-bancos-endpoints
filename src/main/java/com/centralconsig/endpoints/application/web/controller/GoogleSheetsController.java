@@ -40,7 +40,6 @@ public class GoogleSheetsController {
     @DeleteMapping("/{nome}")
     public ResponseEntity<Void> removeSheets(@PathVariable String nome) {
         try {
-            System.out.println("Nome recebido: " + nome);
             String decodedNome = URLDecoder.decode(nome, StandardCharsets.UTF_8);
             GoogleSheet sheet = googleSheetService.findByFileName(decodedNome);
             if (sheet != null) {
