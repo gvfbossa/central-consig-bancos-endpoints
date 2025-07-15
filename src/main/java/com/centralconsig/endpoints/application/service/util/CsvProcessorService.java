@@ -44,8 +44,8 @@ public class CsvProcessorService {
             boolean f1IsCasa = f1.getName().toUpperCase().contains("CASA");
             boolean f2IsCasa = f2.getName().toUpperCase().contains("CASA");
 
-            if (f1IsCasa && !f2IsCasa) return -1;
-            if (!f1IsCasa && f2IsCasa) return 1;
+            if (f1IsCasa && !f2IsCasa) return 1;
+            if (!f1IsCasa && f2IsCasa) return -1;
             return 0;
         });
 
