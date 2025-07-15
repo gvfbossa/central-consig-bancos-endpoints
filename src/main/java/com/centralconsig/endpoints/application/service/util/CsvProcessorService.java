@@ -53,16 +53,14 @@ public class CsvProcessorService {
         Map<String, Cliente> clientesMap = new HashMap<>();
 
         List<GoogleSheet> allSheets = googleSheetService.findAll();
-        Map<String, GoogleSheet> sheetsMap = allSheets.stream()
-                .collect(Collectors.toMap(GoogleSheet::getFileName, sheet -> sheet));
 
         for (File csvFile : csvFiles) {
             try (CSVReader reader = new CSVReader(new FileReader(csvFile))) {
                 String[] header = reader.readNext();
                 if (header == null) continue;
 
-                String currentFileName = csvFile.getName();
-                GoogleSheet sheet = sheetsMap.get(currentFileName);
+                GoogleSheet sheet = findSheetByFileName(csvFile, allSheets)
+                        .orElseThrow(() -> new IllegalStateException("Nenhuma GoogleSheet encontrada para o arquivo: " + csvFile.getName()));
 
                 int cpfIndex = -1;
                 int matriculaIndex = -1;
@@ -114,6 +112,10 @@ public class CsvProcessorService {
         }
         clienteService.salvarOuAtualizarEmLote(new ArrayList<>(clientesMap.values()));
         log.info("Clientes inseridos com sucesso através dos arquivos csv");
+    }
+
+    private Optional<GoogleSheet> findSheetByFileName(File csvFile, List<GoogleSheet> sheets) {
+        return sheets.stream().filter(sheet -> csvFile.getName().toUpperCase().contains(sheet.getFileName().toUpperCase())).findFirst();
     }
 
 }
