@@ -91,7 +91,6 @@ public class GoogleSheetsExtractorService {
         }
 
         WebDriver driver = webDriverService.criarDriver();
-        WebDriverWait wait = webDriverService.criarWait(driver);
 
         try {
             List<GoogleSheet> sheets = sheetRepository.findAll();
@@ -148,6 +147,7 @@ public class GoogleSheetsExtractorService {
                 Thread.sleep(1000);
             } catch (InterruptedException ignored) {}
         }
+        log.info("O arquivo: '" + fileName + "' foi salvo com sucesso em '" + downloadPath + "'");
     }
 
 }

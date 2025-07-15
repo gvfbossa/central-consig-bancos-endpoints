@@ -57,12 +57,14 @@ public class CsvProcessorService {
         for (File csvFile : csvFiles) {
             try (CSVReader reader = new CSVReader(new FileReader(csvFile))) {
                 String[] header = reader.readNext();
-                if (header == null) continue;
+                if (header == null) {
+                    log.error("Header não encontrado para o arquivo '" + csvFile.getName() + "'");
+                    continue;
+                }
+                log.info("Processando arquivo: '" + csvFile.getName() + "'");
 
                 GoogleSheet sheet = findSheetByFileName(csvFile, allSheets)
                         .orElseThrow(() -> new IllegalStateException("Nenhuma GoogleSheet encontrada para o arquivo: " + csvFile.getName()));
-
-                log.info("Processando arquivo: '" + csvFile.getName() + "'");
 
                 int cpfIndex = -1;
                 int matriculaIndex = -1;
