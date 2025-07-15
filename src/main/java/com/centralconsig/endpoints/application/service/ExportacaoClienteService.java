@@ -2,6 +2,7 @@ package com.centralconsig.endpoints.application.service;
 
 import com.centralconsig.core.application.service.ClienteService;
 import com.centralconsig.core.domain.entity.Cliente;
+import com.centralconsig.core.domain.entity.GoogleSheet;
 import com.centralconsig.core.domain.entity.HistoricoConsulta;
 import com.centralconsig.core.domain.entity.Vinculo;
 import com.centralconsig.endpoints.application.service.util.ExportedFile;
@@ -65,7 +66,7 @@ public class ExportacaoClienteService {
                     continue;
                 
                 HistoricoConsulta h = optH.get();
-                
+
                 Row row = sheet.createRow(rowNum++);
                 row.createCell(0).setCellValue(cliente.getNome());
                 row.createCell(1).setCellValue(cliente.getCpf());
@@ -77,7 +78,7 @@ public class ExportacaoClienteService {
                 row.createCell(6).setCellValue(h.getSituacaoCredito());
                 row.createCell(7).setCellValue(h.getMargemCredito().isEmpty() ?
                         "0,00" : h.getMargemCredito());
-                row.createCell(8).setCellValue(cliente.getGoogleSheet().getFileName().isEmpty() ?
+                row.createCell(8).setCellValue(cliente.getGoogleSheet() == null ?
                         "" : cliente.getGoogleSheet().getFileName());
             }
 
