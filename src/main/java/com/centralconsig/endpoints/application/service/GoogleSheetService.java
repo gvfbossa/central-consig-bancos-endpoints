@@ -28,7 +28,14 @@ public class GoogleSheetService {
     }
 
     public GoogleSheet save(GoogleSheet sheet) {
+        if (sheet.getFileName().contains(".csv")) {
+            sheet.setFileName(filterFileName(sheet.getFileName()));
+        }
         return googleSheetRepository.save(sheet);
+    }
+
+    private String filterFileName(String fileName) {
+        return fileName.substring(fileName.indexOf("-"), fileName.indexOf(".csv")).trim();
     }
 
 }
