@@ -35,7 +35,7 @@ public class GoogleSheetService {
     }
 
     private String filterFileName(String fileName) {
-        return fileName.substring(fileName.indexOf("-"), fileName.indexOf(".csv")).trim();
+        return fileName.substring(fileName.indexOf("-") + 1, fileName.indexOf(".csv")).trim();
     }
 
 }
