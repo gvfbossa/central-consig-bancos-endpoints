@@ -1,19 +1,11 @@
 package com.centralconsig.endpoints.application.service.crawler;
 
 import com.centralconsig.core.application.service.crawler.WebDriverService;
-import com.centralconsig.core.application.utils.CrawlerUtils;
 import com.centralconsig.core.domain.entity.GoogleSheet;
 import com.centralconsig.core.domain.repository.GoogleSheetRepository;
 import com.centralconsig.endpoints.application.service.util.CsvProcessorService;
 import jakarta.annotation.PostConstruct;
-import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,8 +14,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.net.URL;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;

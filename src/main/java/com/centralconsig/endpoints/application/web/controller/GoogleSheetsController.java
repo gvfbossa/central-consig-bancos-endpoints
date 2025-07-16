@@ -1,7 +1,6 @@
 package com.centralconsig.endpoints.application.web.controller;
 
 import com.centralconsig.core.domain.entity.GoogleSheet;
-import com.centralconsig.endpoints.application.service.GoogleSheetService;
 import com.centralconsig.endpoints.application.service.crawler.GoogleSheetsExtractorService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
