@@ -29,4 +29,15 @@ public class SystemConfigurationController {
         return ResponseEntity.ok(systemConfigurationService.isPropostaAutomaticaAtiva());
     }
 
+    @PostMapping("/proposta-automatica-planilha/toggle")
+    public ResponseEntity<?> atualizaPropostaAutomaticaPlanilha() {
+        systemConfigurationService.atualizaValorPropostaAutomaticaPlanilha();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/proposta-automatica-planilha")
+    public ResponseEntity<?> valorPropostaAutomaticaPlanilha() {
+        return ResponseEntity.ok(systemConfigurationService.isPropostaAutomaticaPlanilhaAtiva());
+    }
+
 }
