@@ -18,7 +18,7 @@ public class SystemConfigurationController {
 
     @GetMapping("/proposta-automatica")
     public ResponseEntity<?> valorPropostaAutomatica() {
-        return ResponseEntity.ok(systemConfigurationService.isPropostaAutomaticaAtiva());
+        return ResponseEntity.ok(systemConfigurationService.getSystemConfigurations());
     }
 
     @PostMapping("/proposta-automatica/toggle")
