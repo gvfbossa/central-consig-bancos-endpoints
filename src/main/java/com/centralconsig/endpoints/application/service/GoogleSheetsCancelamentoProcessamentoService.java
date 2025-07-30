@@ -86,7 +86,7 @@ public class GoogleSheetsCancelamentoProcessamentoService {
 
         for (Integer linha : linhas) {
             String cellCancelada = SPREADSHEET_NAME + "!D" + (linha + 2);
-            String cellData = SPREADSHEET_NAME + "!E" + (linha + 3);
+            String cellData = SPREADSHEET_NAME + "!E" + (linha + 2);
 
             ValueRange valueRangeCancelada = new ValueRange()
                     .setRange(cellCancelada)
