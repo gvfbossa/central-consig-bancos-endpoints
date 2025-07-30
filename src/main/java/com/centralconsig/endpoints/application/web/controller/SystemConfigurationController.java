@@ -1,12 +1,11 @@
 package com.centralconsig.endpoints.application.web.controller;
 
+import com.centralconsig.core.application.dto.request.SystemConfigurationRequestDTO;
+import com.centralconsig.core.application.dto.response.SystemConfigurationResponseDTO;
 import com.centralconsig.core.application.service.system.SystemConfigurationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/system-configuration")
@@ -18,26 +17,15 @@ public class SystemConfigurationController {
         this.systemConfigurationService = systemConfigurationService;
     }
 
-    @PostMapping("/proposta-automatica/toggle")
-    public ResponseEntity<?> atualizaPropostaAutomatica() {
-        systemConfigurationService.atualizaValorPropostaAutomatica();
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
     @GetMapping("/proposta-automatica")
     public ResponseEntity<?> valorPropostaAutomatica() {
         return ResponseEntity.ok(systemConfigurationService.isPropostaAutomaticaAtiva());
     }
 
-    @PostMapping("/proposta-automatica-planilha/toggle")
-    public ResponseEntity<?> atualizaPropostaAutomaticaPlanilha() {
-        systemConfigurationService.atualizaValorPropostaAutomaticaPlanilha();
+    @PostMapping("/proposta-automatica/toggle")
+    public ResponseEntity<?> atualizaPropostaAutomatica(@RequestBody SystemConfigurationRequestDTO systemConfigurationRequestDTO) {
+        systemConfigurationService.atualizaValorPropostaAutomatica(systemConfigurationRequestDTO);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    @GetMapping("/proposta-automatica-planilha")
-    public ResponseEntity<?> valorPropostaAutomaticaPlanilha() {
-        return ResponseEntity.ok(systemConfigurationService.isPropostaAutomaticaPlanilhaAtiva());
     }
 
 }
