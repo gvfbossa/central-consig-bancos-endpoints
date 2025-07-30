@@ -1,7 +1,6 @@
 package com.centralconsig.endpoints.application.web.controller;
 
 import com.centralconsig.core.application.dto.request.SystemConfigurationRequestDTO;
-import com.centralconsig.core.application.dto.response.SystemConfigurationResponseDTO;
 import com.centralconsig.core.application.service.system.SystemConfigurationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
