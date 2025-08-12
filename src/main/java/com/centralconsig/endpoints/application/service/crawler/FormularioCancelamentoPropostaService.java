@@ -8,7 +8,6 @@ import com.centralconsig.core.domain.entity.Proposta;
 import com.centralconsig.endpoints.application.service.FormularioCancelamentoConfigService;
 import com.centralconsig.endpoints.application.service.GoogleSheetsCancelamentoProcessamentoService;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -121,21 +120,22 @@ public class FormularioCancelamentoPropostaService {
             proposta.setCliente(cliente);
         }
 
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        WebElement emailInput = driver.findElement(
-                By.xpath("//input[contains(@aria-label,'Your email') or contains(@aria-label,'Seu e-mail')]")
-        );
-        js.executeScript(
-                "arguments[0].removeAttribute('disabled'); " +
-                        "arguments[0].removeAttribute('aria-disabled'); " +
-                        "arguments[0].value = arguments[1]; " +
-                        "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));",
-                emailInput, config.getEmail()
-        );
+        Actions actions = new Actions(driver);
+
+        WebElement emailField = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//input[@aria-label='Your email']")));
+        System.out.println("EMAIL FIELD! " + emailField.toString());
+
+        wait.until(ExpectedConditions.not(
+                ExpectedConditions.attributeToBe(emailField, "disabled", "")
+        ));
+        actions.moveToElement(emailField).click().perform();
+        wait.until(ExpectedConditions.elementToBeClickable(emailField)).sendKeys(config.getEmail());
+
 
         WebElement radioCancelamento = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//div[@role='radio' and @aria-label='Cancelamento de proposta']")));
-        Actions actions = new Actions(driver);
+
         actions.moveToElement(radioCancelamento).click().perform();
 
 
