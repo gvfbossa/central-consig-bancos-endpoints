@@ -7,9 +7,7 @@ import com.centralconsig.core.domain.entity.FormularioCancelamentoConfig;
 import com.centralconsig.core.domain.entity.Proposta;
 import com.centralconsig.endpoints.application.service.FormularioCancelamentoConfigService;
 import com.centralconsig.endpoints.application.service.GoogleSheetsCancelamentoProcessamentoService;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -122,10 +120,7 @@ public class FormularioCancelamentoPropostaService {
 
         Actions actions = new Actions(driver);
 
-        By emailField = By.xpath("//input[@aria-label='Your email' or @aria-label='Seu e-mail']");
-
-        WebElement field = wait.until(ExpectedConditions.visibilityOfElementLocated(emailField));
-        field.sendKeys(config.getEmail());
+        preencherEmail(driver, wait, config.getEmail());
 
         WebElement radioCancelamento = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//div[@role='radio' and @aria-label='Cancelamento de proposta']")));
@@ -158,5 +153,56 @@ public class FormularioCancelamentoPropostaService {
                 By.xpath("//div[@role='button']//span[contains(text(),'Enviar') or contains(text(),'Submit')]")));
         actions.moveToElement(botaoEnviar).click().perform();
     }
+
+
+    public void preencherEmail(WebDriver driver, WebDriverWait wait, String email) {
+        By emailXpath = By.xpath("//input[@aria-label='Your email' or @aria-label='Seu e-mail']");
+        WebElement emailField = null;
+
+        try {
+            emailField = wait.until(ExpectedConditions.elementToBeClickable(emailXpath));
+            emailField.clear();
+            emailField.sendKeys(email);
+            System.out.println("✔ Preenchido via XPath direto");
+            return;
+        } catch (TimeoutException e) {
+            System.out.println("⚠ Não achou via XPath direto, tentando via CSS...");
+        }
+
+        try {
+            By emailCss = By.cssSelector("input[aria-label='Your email'], input[aria-label='Seu e-mail']");
+            emailField = wait.until(ExpectedConditions.elementToBeClickable(emailCss));
+            emailField.clear();
+            emailField.sendKeys(email);
+            System.out.println("✔ Preenchido via CSS selector");
+            return;
+        } catch (TimeoutException e) {
+            System.out.println("⚠ Não achou via CSS selector, apelando pro JS...");
+        }
+
+        try {
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            Object el = js.executeScript(
+                    "var el = document.querySelector('input[aria-label=\"Your email\"], input[aria-label=\"Seu e-mail\"]');" +
+                            "if(el) {" +
+                            "  el.removeAttribute('disabled');" +
+                            "  el.removeAttribute('aria-disabled');" +
+                            "  el.focus();" +
+                            "  el.value = arguments[0];" +
+                            "  el.dispatchEvent(new Event('input', { bubbles: true }));" +
+                            "  return el;" +
+                            "} else { return null; }",
+                    email
+            );
+            if (el != null) {
+                System.out.println("✔ Preenchido via JavaScript");
+            } else {
+                throw new RuntimeException("Elemento não encontrado nem via JS");
+            }
+        } catch (Exception e) {
+            System.err.println("💀 Falha geral ao preencher e-mail: " + e.getMessage());
+        }
+    }
+
 
 }
