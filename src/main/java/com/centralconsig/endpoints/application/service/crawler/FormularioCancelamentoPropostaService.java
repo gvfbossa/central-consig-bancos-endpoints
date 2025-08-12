@@ -120,7 +120,9 @@ public class FormularioCancelamentoPropostaService {
             proposta.setCliente(cliente);
         }
 
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@aria-label='Seu e-mail']"))).sendKeys(config.getEmail());
+        wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.xpath("//input[@aria-label='Seu e-mail' or @aria-label='Your email']"))
+        ).sendKeys(config.getEmail());
 
         WebElement radioCancelamento = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//div[@role='radio' and @aria-label='Cancelamento de proposta']")));
@@ -150,7 +152,7 @@ public class FormularioCancelamentoPropostaService {
         actions.moveToElement(radioEstouCiente).click().perform();
 
         WebElement botaoEnviar = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//div[@role='button']//span[contains(text(),'Enviar')]")));
+                By.xpath("//div[@role='button']//span[contains(text(),'Enviar') or contains(text(),'Submit')]")));
         actions.moveToElement(botaoEnviar).click().perform();
     }
 
