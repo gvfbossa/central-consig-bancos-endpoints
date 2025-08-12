@@ -7,6 +7,7 @@ import com.centralconsig.core.domain.entity.FormularioCancelamentoConfig;
 import com.centralconsig.core.domain.entity.Proposta;
 import com.centralconsig.endpoints.application.service.FormularioCancelamentoConfigService;
 import com.centralconsig.endpoints.application.service.GoogleSheetsCancelamentoProcessamentoService;
+import com.centralconsig.endpoints.application.service.PreencheFormHelper;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -105,103 +106,32 @@ public class FormularioCancelamentoPropostaService {
         FormularioCancelamentoConfig config = configService.getConfig();
 
         Optional<Proposta> propostaDb = propostaService.retornaPropostaPorNumero(numero);
-        Proposta proposta;
-
-        if (propostaDb.isPresent())
-            proposta = propostaDb.get();
-        else {
-            proposta = new Proposta();
-            proposta.setNumeroProposta(numero);
+        Proposta proposta = propostaDb.orElseGet(() -> {
+            Proposta p = new Proposta();
+            p.setNumeroProposta(numero);
             Cliente cliente = new Cliente();
             cliente.setNome(nome);
             cliente.setCpf(cpf);
-            proposta.setCliente(cliente);
-        }
+            p.setCliente(cliente);
+            return p;
+        });
 
-        Actions actions = new Actions(driver);
+        PreencheFormHelper helper = new PreencheFormHelper(driver, wait);
 
-        preencherEmail(driver, wait, config.getEmail());
+        helper.fillField(config.getEmail(), "Your email", "Seu e-mail");
 
-        WebElement radioCancelamento = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//div[@role='radio' and @aria-label='Cancelamento de proposta']")));
+        helper.click(By.xpath("//div[@role='radio' and @aria-label='Cancelamento de proposta']"));
 
-        actions.moveToElement(radioCancelamento).click().perform();
+        helper.fillField(proposta.getNumeroProposta(), "Número da proposta", "Proposal number");
+        helper.fillField(proposta.getCliente().getNome(), "Nome", "Name");
+        helper.fillField(proposta.getCliente().getCpf(), "CPF", "Documento", "ID");
+        helper.fillField(config.getMotivoCancelamento(), "Motivo do cancelamento", "Reason for cancellation");
+        helper.fillField(config.getPromotora(), "Promotora", "Agency");
+        helper.fillField(config.getEmail(), "Email de contato", "Contact email");
 
+        helper.click(By.xpath("//div[@role='radio' and @aria-label='Estou ciente.']"));
 
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@aria-labelledby='i19 i22']"))).sendKeys(proposta.getNumeroProposta());
-
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@aria-labelledby='i24 i27']")))
-                .sendKeys(proposta.getCliente().getNome());
-
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@aria-labelledby='i29 i32']")))
-                .sendKeys(proposta.getCliente().getCpf());
-
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@aria-labelledby='i34 i37']")))
-                .sendKeys(config.getMotivoCancelamento());
-
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@aria-labelledby='i39 i42']")))
-                .sendKeys(config.getPromotora());
-
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@aria-labelledby='i44 i47']")))
-                .sendKeys(config.getEmail());
-
-        WebElement radioEstouCiente = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//div[@role='radio' and @aria-label='Estou ciente.']")));
-        actions.moveToElement(radioEstouCiente).click().perform();
-
-        WebElement botaoEnviar = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//div[@role='button']//span[contains(text(),'Enviar') or contains(text(),'Submit')]")));
-        actions.moveToElement(botaoEnviar).click().perform();
-    }
-
-
-    public void preencherEmail(WebDriver driver, WebDriverWait wait, String email) {
-        By emailXpath = By.xpath("//input[@aria-label='Your email' or @aria-label='Seu e-mail']");
-        WebElement emailField = null;
-
-        try {
-            emailField = wait.until(ExpectedConditions.elementToBeClickable(emailXpath));
-            emailField.clear();
-            emailField.sendKeys(email);
-            System.out.println("✔ Preenchido via XPath direto");
-            return;
-        } catch (TimeoutException e) {
-            System.out.println("⚠ Não achou via XPath direto, tentando via CSS...");
-        }
-
-        try {
-            By emailCss = By.cssSelector("input[aria-label='Your email'], input[aria-label='Seu e-mail']");
-            emailField = wait.until(ExpectedConditions.elementToBeClickable(emailCss));
-            emailField.clear();
-            emailField.sendKeys(email);
-            System.out.println("✔ Preenchido via CSS selector");
-            return;
-        } catch (TimeoutException e) {
-            System.out.println("⚠ Não achou via CSS selector, apelando pro JS...");
-        }
-
-        try {
-            JavascriptExecutor js = (JavascriptExecutor) driver;
-            Object el = js.executeScript(
-                    "var el = document.querySelector('input[aria-label=\"Your email\"], input[aria-label=\"Seu e-mail\"]');" +
-                            "if(el) {" +
-                            "  el.removeAttribute('disabled');" +
-                            "  el.removeAttribute('aria-disabled');" +
-                            "  el.focus();" +
-                            "  el.value = arguments[0];" +
-                            "  el.dispatchEvent(new Event('input', { bubbles: true }));" +
-                            "  return el;" +
-                            "} else { return null; }",
-                    email
-            );
-            if (el != null) {
-                System.out.println("✔ Preenchido via JavaScript");
-            } else {
-                throw new RuntimeException("Elemento não encontrado nem via JS");
-            }
-        } catch (Exception e) {
-            System.err.println("💀 Falha geral ao preencher e-mail: " + e.getMessage());
-        }
+        helper.click(By.xpath("//div[@role='button']//span[contains(text(),'Enviar') or contains(text(),'Submit')]"));
     }
 
 
