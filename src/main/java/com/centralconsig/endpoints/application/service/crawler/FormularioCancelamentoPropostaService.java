@@ -122,7 +122,7 @@ public class FormularioCancelamentoPropostaService {
 
         Actions actions = new Actions(driver);
 
-        WebElement emailField = wait.until(ExpectedConditions.elementToBeClickable(
+        WebElement emailField = wait.until(ExpectedConditions.presenceOfElementLocated(
                 By.xpath("//input[@aria-label='Your email']")));
 
         actions.moveToElement(emailField).click().perform();
