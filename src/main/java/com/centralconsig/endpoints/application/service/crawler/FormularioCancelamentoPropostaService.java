@@ -8,6 +8,7 @@ import com.centralconsig.core.domain.entity.Proposta;
 import com.centralconsig.endpoints.application.service.FormularioCancelamentoConfigService;
 import com.centralconsig.endpoints.application.service.GoogleSheetsCancelamentoProcessamentoService;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -120,10 +121,17 @@ public class FormularioCancelamentoPropostaService {
             proposta.setCliente(cliente);
         }
 
-        By emailField = By.xpath("//input[contains(@aria-label,'Your email') or contains(@aria-label,'Seu e-mail')]");
-        WebElement field = wait.until(ExpectedConditions.presenceOfElementLocated(emailField));
-        wait.until(driver -> field.isEnabled());
-        field.sendKeys(config.getEmail());
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        WebElement emailInput = driver.findElement(
+                By.xpath("//input[contains(@aria-label,'Your email') or contains(@aria-label,'Seu e-mail')]")
+        );
+        js.executeScript(
+                "arguments[0].removeAttribute('disabled'); " +
+                        "arguments[0].removeAttribute('aria-disabled'); " +
+                        "arguments[0].value = arguments[1]; " +
+                        "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));",
+                emailInput, config.getEmail()
+        );
 
         WebElement radioCancelamento = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//div[@role='radio' and @aria-label='Cancelamento de proposta']")));
