@@ -122,6 +122,24 @@ public class FormularioCancelamentoPropostaService {
 
         Actions actions = new Actions(driver);
 
+        List<WebElement> inputs = driver.findElements(By.tagName("input"));
+        System.out.println("Total de inputs encontrados: " + inputs.size());
+
+        for (WebElement in : inputs) {
+            try {
+                System.out.println(
+                        "type=" + in.getAttribute("type") +
+                                " | aria-label=" + in.getAttribute("aria-label") +
+                                " | enabled=" + in.isEnabled() +
+                                "\nHTML: " + in.getAttribute("outerHTML") +
+                                "\n--------------------------------------------------"
+                );
+            } catch (Exception e) {
+                System.out.println("Erro ao ler input: " + e.getMessage());
+            }
+        }
+
+
         WebElement emailField = wait.until(ExpectedConditions.presenceOfElementLocated(
                 By.xpath("//input[@aria-label='Your email']")));
 
