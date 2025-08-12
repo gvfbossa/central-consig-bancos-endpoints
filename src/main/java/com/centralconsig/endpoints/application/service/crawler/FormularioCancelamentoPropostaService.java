@@ -122,17 +122,16 @@ public class FormularioCancelamentoPropostaService {
 
         helper.click(By.xpath("//div[@role='radio' and @aria-label='Cancelamento de proposta']"));
 
-        helper.fillField(proposta.getNumeroProposta(), "Número da proposta", "Proposal number");
-        helper.fillField(proposta.getCliente().getNome(), "Nome", "Name");
-        helper.fillField(proposta.getCliente().getCpf(), "CPF", "Documento", "ID");
-        helper.fillField(config.getMotivoCancelamento(), "Motivo do cancelamento", "Reason for cancellation");
-        helper.fillField(config.getPromotora(), "Promotora", "Agency");
-        helper.fillField(config.getEmail(), "Email de contato", "Contact email");
+        helper.fillField(proposta.getNumeroProposta(), "i19 i22");
+        helper.fillField(proposta.getCliente().getNome(), "i24 i27");
+        helper.fillField(proposta.getCliente().getCpf(), "i29 i32");
+        helper.fillField(config.getMotivoCancelamento(), "i34 i37");
+        helper.fillField(config.getPromotora(), "i39 i42");
+        helper.fillField(config.getEmail(), "i44 i47");
 
         helper.click(By.xpath("//div[@role='radio' and @aria-label='Estou ciente.']"));
 
         helper.click(By.xpath("//div[@role='button']//span[contains(text(),'Enviar') or contains(text(),'Submit')]"));
     }
-
 
 }

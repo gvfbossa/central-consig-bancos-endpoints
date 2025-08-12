@@ -57,21 +57,40 @@ public class PreencheFormHelper {
                 String name = input.getAttribute("name");
                 String placeholder = input.getAttribute("placeholder");
                 String id = input.getAttribute("id");
+                String ariaLabelledBy = input.getAttribute("aria-labelledby");
 
                 for (String label : possibleLabels) {
-                    if ((aria != null && aria.toLowerCase().contains(label.toLowerCase())) ||
-                            (name != null && name.toLowerCase().contains(label.toLowerCase())) ||
-                            (placeholder != null && placeholder.toLowerCase().contains(label.toLowerCase())) ||
-                            (id != null && id.toLowerCase().contains(label.toLowerCase()))) {
+                    String labelLower = label.toLowerCase();
 
+                    // checa substring normal
+                    if ((aria != null && aria.toLowerCase().contains(labelLower)) ||
+                            (name != null && name.toLowerCase().contains(labelLower)) ||
+                            (placeholder != null && placeholder.toLowerCase().contains(labelLower)) ||
+                            (id != null && id.toLowerCase().contains(labelLower))) {
+
+                        removeDisabledIfExists(input);
+                        wait.until(ExpectedConditions.elementToBeClickable(input));
+                        return input;
+                    }
+
+                    if (ariaLabelledBy != null && ariaLabelledBy.equalsIgnoreCase(label)) {
+                        removeDisabledIfExists(input);
                         wait.until(ExpectedConditions.elementToBeClickable(input));
                         return input;
                     }
                 }
+
             } catch (StaleElementReferenceException ignored) {}
         }
 
         throw new NoSuchElementException("Nenhum campo encontrado para labels: " + Arrays.toString(possibleLabels));
+    }
+
+    private void removeDisabledIfExists(WebElement element) {
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript(
+                "arguments[0].removeAttribute('disabled'); arguments[0].removeAttribute('aria-disabled');",
+                element);
     }
 
     public void fillField(String value, String... possibleLabels) {
