@@ -132,6 +132,8 @@ public class FormularioCancelamentoPropostaService {
         helper.click(By.xpath("//div[@role='radio' and @aria-label='Estou ciente.']"));
 
         helper.click(By.xpath("//div[@role='button']//span[contains(text(),'Enviar') or contains(text(),'Submit')]"));
+
+        log.info("Proposta '" + numero + "' cancelada com sucesso");
     }
 
 }
