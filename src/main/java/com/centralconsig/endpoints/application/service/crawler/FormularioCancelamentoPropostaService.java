@@ -120,9 +120,9 @@ public class FormularioCancelamentoPropostaService {
             proposta.setCliente(cliente);
         }
 
-        wait.until(ExpectedConditions.presenceOfElementLocated(
-                By.xpath("//input[@aria-label='Seu e-mail' or @aria-label='Your email']"))
-        ).sendKeys(config.getEmail());
+        wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//input[contains(@aria-label,'Seu e-mail') or contains(@aria-label,'Your email')]")
+        )).sendKeys(config.getEmail());
 
         WebElement radioCancelamento = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//div[@role='radio' and @aria-label='Cancelamento de proposta']")));
