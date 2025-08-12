@@ -124,11 +124,7 @@ public class FormularioCancelamentoPropostaService {
 
         WebElement emailField = wait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//input[@aria-label='Your email']")));
-        System.out.println("EMAIL FIELD! " + emailField.toString());
 
-        wait.until(ExpectedConditions.not(
-                ExpectedConditions.attributeToBe(emailField, "disabled", "")
-        ));
         actions.moveToElement(emailField).click().perform();
         wait.until(ExpectedConditions.elementToBeClickable(emailField)).sendKeys(config.getEmail());
 
