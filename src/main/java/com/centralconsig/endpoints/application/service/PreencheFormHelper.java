@@ -1,9 +1,12 @@
 package com.centralconsig.endpoints.application.service;
 
+import com.centralconsig.endpoints.application.service.crawler.FormularioCancelamentoPropostaService;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -13,6 +16,8 @@ public class PreencheFormHelper {
     private final WebDriver driver;
     private final WebDriverWait wait;
     private final Actions actions;
+
+    private static final Logger log = LoggerFactory.getLogger(PreencheFormHelper.class);
 
     public PreencheFormHelper(WebDriver driver, WebDriverWait wait) {
         this.driver = driver;
@@ -107,10 +112,14 @@ public class PreencheFormHelper {
             field.click();
             field.sendKeys(value);
         } catch (ElementNotInteractableException e) {
-            ((JavascriptExecutor) driver).executeScript(
-                    "arguments[0].value = arguments[1]; arguments[0].dispatchEvent(new Event('input', { bubbles: true }));",
-                    field, value
-            );
+            try {
+                ((JavascriptExecutor) driver).executeScript(
+                        "arguments[0].value = arguments[1]; arguments[0].dispatchEvent(new Event('input', { bubbles: true }));",
+                        field, value
+                );
+            } catch (Exception ex) {
+                log.error("Erro ao executar fillField para o campo '" + value + "'. Erro: " + ex.getMessage());
+            }
         }
     }
 }

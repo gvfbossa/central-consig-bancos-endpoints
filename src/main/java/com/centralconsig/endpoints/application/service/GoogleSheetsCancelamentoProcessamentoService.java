@@ -83,7 +83,6 @@ public class GoogleSheetsCancelamentoProcessamentoService {
 
     public void marcarComoProcessado(List<Integer> linhas) throws IOException {
         List<ValueRange> updates = new ArrayList<>();
-
         for (Integer linha : linhas) {
             String cellCancelada = SPREADSHEET_NAME + "!D" + (linha + 2);
             String cellData = SPREADSHEET_NAME + "!E" + (linha + 2);
